@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Name Manager</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 20px auto; }
+    input, button { margin: 5px; padding: 5px; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 3px 0; display: flex; justify-content: space-between; }
+    .favorites { margin-top: 20px; }
+    .count { font-weight: bold; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Name Manager</h2>
+
+  <input id="nameInput" placeholder="Enter full name">
+  <button onclick="addName()">Add</button>
+  <button onclick="copyNames()">Copy Names</button>
+
+  <div class="count" id="count">Total names: 0</div>
+  <ul id="nameList"></ul>
+
+  <div class="favorites">
+    <h3>Favorites</h3>
+    <input id="favInput" placeholder="Add favorite name">
+    <button onclick="addFavorite()">Save Favorite</button>
+    <ul id="favList"></ul>
+  </div>
+
+  <script>
+    let names = JSON.parse(localStorage.getItem('names') || '[]');
+    let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+    function sortByLastName(a, b) {
+      const lastA = a.trim().split(' ').slice(-1)[0].toLowerCase();
+      const lastB = b.trim().split(' ').slice(-1)[0].toLowerCase();
+      return lastA.localeCompare(lastB);
+    }
+
+    function updateDisplay() {
+      names.sort(sortByLastName);
+      localStorage.setItem('names', JSON.stringify(names));
+      const list = document.getElementById('nameList');
+      list.innerHTML = '';
+      names.forEach((n, i) => {
+        const li = document.createElement('li');
+        li.textContent = n;
+        const del = document.createElement('button');
+        del.textContent = 'Remove';
+        del.onclick = () => { names.splice(i, 1); updateDisplay(); };
+        li.appendChild(del);
+        list.appendChild(li);
+      });
+      document.getElementById('count').textContent = `Total names: ${names.length}`;
+      updateFavorites();
+    }
+
+    function addName() {
+      const input = document.getElementById('nameInput');
+      const name = input.value.trim();
+      if (name) {
+        names.push(name);
+        input.value = '';
+        updateDisplay();
+      }
+    }
+
+    function addFavorite() {
+      const input = document.getElementById('favInput');
+      const fav = input.value.trim();
+      if (fav && !favorites.includes(fav)) {
+        favorites.push(fav);
+        input.value = '';
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        updateFavorites();
+      }
+    }
+
+    function updateFavorites() {
+      const list = document.getElementById('favList');
+      list.innerHTML = '';
+      favorites.forEach(f => {
+        const li = document.createElement('li');
+        li.textContent = f;
+        const addBtn = document.createElement('button');
+        addBtn.textContent = 'Add';
+        addBtn.onclick = () => { names.push(f); updateDisplay(); };
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Remove';
+        delBtn.onclick = () => {
+          favorites = favorites.filter(x => x !== f);
+          localStorage.setItem('favorites', JSON.stringify(favorites));
+          updateFavorites();
+        };
+        li.appendChild(addBtn);
+        li.appendChild(delBtn);
+        list.appendChild(li);
+      });
+    }
+
+    async function copyNames() {
+      const text = names.join('\n');
+      await navigator.clipboard.writeText(text);
+      alert('Names copied to clipboard.');
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
