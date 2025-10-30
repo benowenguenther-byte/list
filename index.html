@@ -2,21 +2,64 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Name Manager</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 20px auto; }
-    input, button { margin: 5px; padding: 5px; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 3px 0; display: flex; justify-content: space-between; }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 10px;
+      max-width: 600px;
+      margin-inline: auto;
+    }
+    h2, h3 { text-align: center; }
+    input, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      margin: 5px 0;
+      font-size: 16px;
+    }
+    button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      background: #f4f4f4;
+      margin: 4px 0;
+      border-radius: 6px;
+    }
+    .count { text-align: center; font-weight: bold; margin-top: 10px; }
     .favorites { margin-top: 20px; }
-    .count { font-weight: bold; margin-top: 10px; }
+    .small-btn {
+      background: #dc3545;
+      margin-left: 5px;
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+    .small-btn.add {
+      background: #28a745;
+    }
   </style>
 </head>
 <body>
   <h2>Name Manager</h2>
 
   <input id="nameInput" placeholder="Enter full name">
-  <button onclick="addName()">Add</button>
+  <button onclick="addName()">Add Name</button>
   <button onclick="copyNames()">Copy Names</button>
 
   <div class="count" id="count">Total names: 0</div>
@@ -49,6 +92,7 @@
         li.textContent = n;
         const del = document.createElement('button');
         del.textContent = 'Remove';
+        del.className = 'small-btn';
         del.onclick = () => { names.splice(i, 1); updateDisplay(); };
         li.appendChild(del);
         list.appendChild(li);
@@ -86,9 +130,11 @@
         li.textContent = f;
         const addBtn = document.createElement('button');
         addBtn.textContent = 'Add';
+        addBtn.className = 'small-btn add';
         addBtn.onclick = () => { names.push(f); updateDisplay(); };
         const delBtn = document.createElement('button');
         delBtn.textContent = 'Remove';
+        delBtn.className = 'small-btn';
         delBtn.onclick = () => {
           favorites = favorites.filter(x => x !== f);
           localStorage.setItem('favorites', JSON.stringify(favorites));
